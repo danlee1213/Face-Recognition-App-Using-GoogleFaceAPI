@@ -40,7 +40,7 @@ __GraphicOverlay__: One more Google class; FaceGraphic subclasses it.
 <img src=https://user-images.githubusercontent.com/72503871/117692116-48b42e00-b1ef-11eb-94c6-04f96a67d622.jpg width="480">
 This information will be saved in a FaceData object, instead of the provided Face object. For facial landmarks, “left” and “right” refer to the subject’s left and right. Viewed through the front camera, the subject’s right eye will be closer to the right side of the screen, but through the rear camera, it’ll be closer to the left.
 
-## Expected Outputs
+## How it works
 In FaceTracker class:
 ```Java
  //2
@@ -98,6 +98,85 @@ In FaceTracker class:
 
 2. The same is for smiling with getIsSmilingProbability, but more strictly. If the detector thinks that there’s a greater than 80% chance that the face is smiling, it’s considered to be smiling.
 
+Now, overlay any tracked face with these cartoon features:
+1. Cartoon eyes over the real eyes, with each cartoon eye reflecting the real eye’s open/closed state
+2. A pig nose over the real nose
+3. A mustache
+4. If the tracked face is smiling, the cartoon irises in its cartoon eyes are rendered as smiling stars
+
+Apply cartoon images using draw method in FaceGraphic class:
+```Java
+@Override
+  public void draw(Canvas canvas) {
+    final float DOT_RADIUS = 3.0f;
+    final float TEXT_OFFSET_Y = -30.0f;
+
+    //Confirm that the face and its features are still visible before drawing any graphics over it
+    if(mFaceData == null){
+      return;
+    }
+    //1
+    PointF detectPosition = mFaceData.getPosition();
+    PointF detectLeftEyePosition = mFaceData.getLeftEyePosition();
+    PointF detectRightEyePosition = mFaceData.getRightEyePosition();
+    PointF detectNoseBasePosition = mFaceData.getNoseBasePosition();
+    PointF detectMouthLeftPosition = mFaceData.getMouthLeftPosition();
+    PointF detectMouthBottomPosition = mFaceData.getMouthBottomPosition();
+    PointF detectMouthRightPosition = mFaceData.getMouthRightPosition();
+    if((detectPosition == null || detectLeftEyePosition == null || detectRightEyePosition == null || detectNoseBasePosition == null
+    || detectMouthLeftPosition == null || detectMouthBottomPosition == null || detectMouthRightPosition == null)){
+      return;
+    }
+    //2
+    //Face position and dimensions
+    PointF position = new PointF(translateX(detectPosition.x), translateY(detectPosition.y));
+    float width = scaleX(mFaceData.getWidth());
+    float height = scaleY(mFaceData.getHeight());
+
+    //3
+    //Eye coordinates
+    PointF leftEyePosition = new PointF(translateX(detectLeftEyePosition.x), translateY(detectLeftEyePosition.y));
+    PointF rightEyePosition = new PointF(translateX(detectRightEyePosition.x), translateY(detectRightEyePosition.y));
+
+    //Eye state
+    boolean leftEyeOpen = mFaceData.isLeftEyeOpen();
+    boolean rightEyeOpen = mFaceData.isRightEyeOpen();
+
+    //Nose coordinates
+    PointF noseBasePosition = new PointF(translateX(detectNoseBasePosition.x), translateY(detectNoseBasePosition.y));
+
+    //Mouth coordinates
+    PointF mouthLeftPosition = new PointF(translateX(detectMouthLeftPosition.x), translateY(detectMouthLeftPosition.y));
+    PointF mouthRightPosition = new PointF(translateX(detectMouthRightPosition.x), translateY(detectMouthRightPosition.y));
+    PointF mouthBottomPosition = new PointF(translateX(detectMouthBottomPosition.x), translateY(detectMouthBottomPosition.y));
+
+    //Smile state
+    boolean smiling = mFaceData.isSmiling();
+
+    //Calculate the distance between the eyes using Pythagoras' formula
+    //Use that distance to set the size of the eyes and irises
+    final float EYE_RADIUS_PROPORTION = 0.45f;
+    final float IRIS_RADIUS_PROPORTION = EYE_RADIUS_PROPORTION / 2.0f;
+    float distance = (float) Math.sqrt((rightEyePosition.x - leftEyePosition.x) * (rightEyePosition.x - leftEyePosition.x)
+    + (rightEyePosition.y - leftEyePosition.y) * (rightEyePosition.y - leftEyePosition.y));
+    float eyeRadius = EYE_RADIUS_PROPORTION * distance;
+    float irisRadius = IRIS_RADIUS_PROPORTION * distance;
+
+    //Draw the eyes
+    drawEye(canvas, leftEyePosition, eyeRadius, leftEyePosition, irisRadius, leftEyeOpen, smiling);
+    drawEye(canvas, rightEyePosition, eyeRadius, rightEyePosition, irisRadius, rightEyeOpen, smiling);
+
+    //Draw the nose
+    drawNose(canvas, noseBasePosition, leftEyePosition, rightEyePosition, width);
+
+    //Draw the mustache
+    drawMustache(canvas, noseBasePosition, mouthLeftPosition, mouthRightPosition);
+  }
+```
+
+## Expected outputs
+### 1. Non-smiling faces with both eyes open
+![notsmile](https://user-images.githubusercontent.com/72503871/117706566-0c3cfe00-b200-11eb-8270-506465643a96.jpg)
 
 
 # Install the app
