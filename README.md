@@ -177,7 +177,10 @@ Apply cartoon images using draw method in FaceGraphic class:
 ## Expected outputs
 ### 1. Non-smiling faces with both eyes open
 ![notsmile](https://user-images.githubusercontent.com/72503871/117706566-0c3cfe00-b200-11eb-8270-506465643a96.jpg)
-
+### 2. Non-smiling faces with one eye close
+![oneeyeclosed](https://user-images.githubusercontent.com/72503871/117706573-0e06c180-b200-11eb-9367-d7c4dc2b0362.jpg)
+### 3. Smiling faces
+![smilingface](https://user-images.githubusercontent.com/72503871/117706581-0f37ee80-b200-11eb-80cb-c4ae6a527f67.jpg)
 
 # Install the app
 Install the debug app in the following path:
