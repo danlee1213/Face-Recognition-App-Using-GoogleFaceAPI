@@ -94,6 +94,9 @@ In FaceTracker class:
     mFaceGraphic.update(mFaceData);
   }
 ```
+1. FaceGraphic should be responsible simply for drawing graphics over faces, not determining whether an eye is open or closed based on the face detector’s probability assessments. This means that FaceTracker should do those calculations and provide FaceGraphic with ready-to-eat data in the form of a FaceData instance. These calculations take the results from getIsLeftEyeOpenProbability and getIsRightEyeOpenProbability and turn them into a simple true/false value. If the detector thinks that there’s a greater than 40% chance that an eye is open, it’s considered open.
+
+2. The same is for smiling with getIsSmilingProbability, but more strictly. If the detector thinks that there’s a greater than 80% chance that the face is smiling, it’s considered to be smiling.
 
 
 
