@@ -36,6 +36,69 @@ __CameraSourcePreview__: Another class from Google. It displays the live image d
 __GraphicOverlay__: One more Google class; FaceGraphic subclasses it.
 
 
+## Landmarks that the Face API can identify
+<img src=https://user-images.githubusercontent.com/72503871/117692116-48b42e00-b1ef-11eb-94c6-04f96a67d622.jpg width="480">
+This information will be saved in a FaceData object, instead of the provided Face object. For facial landmarks, “left” and “right” refer to the subject’s left and right. Viewed through the front camera, the subject’s right eye will be closer to the right side of the screen, but through the rear camera, it’ll be closer to the left.
+
+## Expected Outputs
+In FaceTracker class:
+```Java
+ //2
+  @Override
+  public void onUpdate(Detector.Detections<Face>detectionResults, Face face){
+    mOverlay.add(mFaceGraphic);
+    updatePreviousLandmarkPositions(face);
+
+    //Get face dimensions
+    mFaceData.setPosition(face.getPosition());
+    mFaceData.setWidth(face.getWidth());
+    mFaceData.setHeight(face.getHeight());
+
+    //Get the positions of facial landmarks
+    updatePreviousLandmarkPositions(face);
+    mFaceData.setLeftEyePosition(getLandmarkPosition(face, Landmark.LEFT_EYE));
+    mFaceData.setRightEyePosition(getLandmarkPosition(face, Landmark.RIGHT_EYE));
+    mFaceData.setMouthBottomPosition(getLandmarkPosition(face, Landmark.LEFT_CHEEK));
+    mFaceData.setMouthBottomPosition(getLandmarkPosition(face, Landmark.RIGHT_CHEEK));
+    mFaceData.setNoseBasePosition(getLandmarkPosition(face, Landmark.NOSE_BASE));
+    mFaceData.setMouthBottomPosition(getLandmarkPosition(face, Landmark.LEFT_EAR));
+    mFaceData.setMouthBottomPosition(getLandmarkPosition(face, Landmark.LEFT_EAR_TIP));
+    mFaceData.setMouthBottomPosition(getLandmarkPosition(face, Landmark.RIGHT_EAR));
+    mFaceData.setMouthBottomPosition(getLandmarkPosition(face, Landmark.RIGHT_EAR_TIP));
+    mFaceData.setMouthLeftPosition(getLandmarkPosition(face, Landmark.LEFT_MOUTH));
+    mFaceData.setMouthBottomPosition(getLandmarkPosition(face, Landmark.BOTTOM_MOUTH));
+    mFaceData.setMouthRightPosition(getLandmarkPosition(face, Landmark.RIGHT_MOUTH));
+
+    //1
+    final float EYE_CLOSED_THRESHOLD = 0.4f;
+    float leftOpenScore = face.getIsLeftEyeOpenProbability();
+    if(leftOpenScore == Face.UNCOMPUTED_PROBABILITY){
+      mFaceData.setLeftEyeOpen(mPreviousIsLeftEyeOpen);
+    }else{
+      mFaceData.setLeftEyeOpen(leftOpenScore > EYE_CLOSED_THRESHOLD);
+      mPreviousIsLeftEyeOpen = mFaceData.isLeftEyeOpen();
+    }
+    float rightOpenScore = face.getIsRightEyeOpenProbability();
+    if(rightOpenScore == Face.UNCOMPUTED_PROBABILITY){
+      mFaceData.setRightEyeOpen(mPreviousIsRightEyeOpen);
+    }else{
+      mFaceData.setRightEyeOpen(rightOpenScore > EYE_CLOSED_THRESHOLD);
+      mPreviousIsRightEyeOpen = mFaceData.isRightEyeOpen();
+    }
+
+    //2
+    //Determine if person is smiling.
+    final float SMILING_THRESHOLD = 0.8f;
+    mFaceData.setSmiling(face.getIsSmilingProbability() > SMILING_THRESHOLD);
+
+    mFaceGraphic.update(mFaceData);
+  }
+```
 
 
-Install app \SmileDetection\app\build\outputs\apk\debug\app-debug.apk
+
+# Install the app
+Install the debug app in the following path:
+```
+\SmileDetection\app\build\outputs\apk\debug\app-debug.apk
+```
