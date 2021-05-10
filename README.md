@@ -20,5 +20,22 @@ A __landmark__ is a point of interest within a face. The left eye, right eye, an
 
 __Classification__ is determining whether a certain facial characteristic is present. For example, a face can be classified with regards to whether its eyes are open or closed. Another example is whether the face is smiling or not.
 
+## Brief explanation for each class
+__FaceActivity__: The main activity of the app which shows the camera preview. 
+
+__FaceTracker__: Follows faces that are detected in images from the camera, and gathers their positions and landmarks. 
+
+__FaceGraphic__: Draws the computer-generated images over faces in the camera images. 
+
+__FaceData__: A data class for passing FaceTracker data to FaceGraphic. 
+
+__EyePhysics__: Provided by Google in their Mobile Vision sample apps on GitHub, it’s a simple physics engine that will animate the AR irises as the faces they’re on move. 
+
+__CameraSourcePreview__: Another class from Google. It displays the live image data from the camera in a view. 
+
+__GraphicOverlay__: One more Google class; FaceGraphic subclasses it.
+
+
+
 
 Install app \SmileDetection\app\build\outputs\apk\debug\app-debug.apk
